@@ -27,6 +27,7 @@ db.exec(`
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     phone TEXT,
+    address TEXT,
     role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','employee','manager','owner')),
     is_verified INTEGER DEFAULT 0,
     is_active INTEGER DEFAULT 1,
