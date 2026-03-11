@@ -263,7 +263,7 @@ router.put('/:id', authenticate, requireMinRole('employee'), (req, res) => {
 // ══════════════════════════════════════════════════════════
 // POST /api/listings/:id/images — Upload images
 // ══════════════════════════════════════════════════════════
-router.post('/:id/images', authenticate, requireMinRole('employee'), upload.array('images', 10), (req, res) => {
+router.post('/:id/images', authenticate, requireMinRole('employee'), upload.array('images', 10), async (req, res) => {
   try {
     const db = getDb();
     const listing = db.prepare('SELECT * FROM listings WHERE id=?').get(req.params.id);
