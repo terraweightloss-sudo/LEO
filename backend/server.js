@@ -158,4 +158,10 @@ app.listen(PORT, () => {
   console.log(`🚀  Running at http://localhost:${PORT}`);
   console.log(`📊  Admin panel: http://localhost:${PORT}/admin`);
   console.log(`🔑  Default login: owner@leosauctions.com / LeoOwner2026!\n`);
+  // Run DB migrations for new columns
+  try {
+    const { getDb } = require('./db/connection');
+    const db = getDb();
+    try { db.prepare('ALTER TABLE users ADD COLUMN address TEXT').run(); console.log('✅ Migration: added address column'); } catch(_) {}
+  } catch(e) { console.error('Migration error:', e.message); }
 });
