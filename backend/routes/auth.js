@@ -8,10 +8,12 @@ const { generateToken, authenticate } = require('../middleware/auth');
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, first_name, last_name, phone } = req.body;
+    const { email, password, first_name, last_name, phone, address } = req.body;
     if (!email || !password || !first_name || !last_name) {
       return res.status(400).json({ error: 'Email, password, first name, and last name are required' });
     }
+    if (!phone) return res.status(400).json({ error: 'Phone number is required' });
+    if (!address) return res.status(400).json({ error: 'Address is required' });
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password must be at least 8 characters' });
     }
@@ -27,9 +29,9 @@ router.post('/register', async (req, res) => {
     const password_hash = await bcrypt.hash(password, 12);
     const id = uuidv4();
     db.prepare(`
-      INSERT INTO users (id, email, password_hash, first_name, last_name, phone, role, is_verified)
-      VALUES (?, ?, ?, ?, ?, ?, 'customer', 1)
-    `).run(id, email.toLowerCase(), password_hash, first_name.trim(), last_name.trim(), phone || null);
+      INSERT INTO users (id, email, password_hash, first_name, last_name, phone, address, role, is_verified)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'customer', 1)
+    `).run(id, email.toLowerCase(), password_hash, first_name.trim(), last_name.trim(), phone || null, address || null);
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
     const token = generateToken(user);
