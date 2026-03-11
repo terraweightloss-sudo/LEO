@@ -201,6 +201,27 @@ router.put('/users/:id/status', requireMinRole('manager'), (req, res) => {
   }
 });
 
+// DELETE /admin/users/:id — Owner only, cannot delete owners
+router.delete('/users/:id', requireRole('owner'), (req, res) => {
+  try {
+    const db = getDb();
+    const user = db.prepare('SELECT * FROM users WHERE id=?').get(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.role === 'owner') return res.status(403).json({ error: 'Cannot delete owner accounts' });
+    if (user.id === req.user.id) return res.status(403).json({ error: 'Cannot delete your own account' });
+    db.prepare(`INSERT INTO audit_log (id,user_id,user_email,user_role,action,entity_type,entity_id,old_value)
+      VALUES (?,?,?,?,?,?,?,?)`).run(uuidv4(), req.user.id, req.user.email, req.user.role, 'USER_DELETED', 'user', user.id, user.email);
+    db.prepare('DELETE FROM bids WHERE user_id=?').run(user.id);
+    db.prepare('DELETE FROM deal_alerts WHERE user_id=?').run(user.id);
+    db.prepare('DELETE FROM saved_listings WHERE user_id=?').run(user.id);
+    db.prepare('DELETE FROM users WHERE id=?').run(user.id);
+    res.json({ message: `User ${user.email} deleted` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
 // ══════════════════════════════════════════════════════════
 // AUDIT LOG (owner only)
 // ══════════════════════════════════════════════════════════
