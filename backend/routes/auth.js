@@ -62,7 +62,6 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ error: 'Invalid email or password' });
 
-    db.prepare('UPDATE users SET last_login = datetime("now") WHERE id = ?').run(user.id);
     db.prepare(`INSERT INTO audit_log (id, user_id, user_email, user_role, action, entity_type, entity_id)
       VALUES (?, ?, ?, ?, ?, ?, ?)`).run(uuidv4(), user.id, user.email, user.role, 'USER_LOGIN', 'user', user.id);
 
