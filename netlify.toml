@@ -35,7 +35,7 @@
 # Replace the :to URL with your actual backend URL after deploying the backend
 [[redirects]]
   from = "/api/*"
-  to = "https://YOUR-BACKEND-URL.railway.app/api/:splat"
+  to = "https://leo-production-a629.up.railway.app/api/:splat"
   status = 200
   force = true
 
