@@ -301,7 +301,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
     <div class="hero-inner">
       <div class="hero-badge">★ Tampa Bay's #1 Amazon Return Auction ★</div>
       <h1 class="hero-h1">Like New Deals<br/><em>for Less</em></h1>
-      <p class="hero-sub">Amazon return auctions — electronics, furniture, appliances & more at 10–50% of retail. Bid online, pick up in Tampa.</p>
+      <p class="hero-sub">Amazon return auctions — electronics, furniture, appliances & more for a fraction of the original price. Bid online, pick up in Tampa.</p>
       <div class="hero-actions">
         <button class="btn btn-gold" onclick="document.getElementById('listings-sec').scrollIntoView({behavior:'smooth'})">🔨 Bid Now</button>
         <button class="btn btn-outline-white" onclick="openMod('m-deal-alert')">🔔 Deal Alerts</button>
@@ -309,7 +309,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
       <div class="hero-stats">
         <div class="hero-stat"><div class="stat-num" id="live-cnt">—</div><div class="stat-lbl">Live Auctions</div></div>
         <div class="hero-stat"><div class="stat-num">$1</div><div class="stat-lbl">Starting Bids</div></div>
-        <div class="hero-stat"><div class="stat-num">10–50%</div><div class="stat-lbl">Off Retail</div></div>
+        <div class="hero-stat"><div class="stat-num">SAVE</div><div class="stat-lbl">A Fraction of Price</div></div>
         <div class="hero-stat"><div class="stat-num">Daily</div><div class="stat-lbl">New Inventory</div></div>
       </div>
     </div>
@@ -464,7 +464,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
       </div>
       <div class="form-group"><label class="form-label">Email *</label><input class="form-input" type="email" id="rg-email" placeholder="you@email.com"/></div>
       <div class="form-group"><label class="form-label">Password *</label><input class="form-input" type="password" id="rg-pass" placeholder="Min 8 characters"/></div>
-      <div class="form-group"><label class="form-label">Phone (optional)</label><input class="form-input" type="tel" id="rg-phone" placeholder="(813) 555-0000"/></div>
+      <div class="form-group"><label class="form-label">Phone * <span style="font-size:.72rem;color:var(--mid)">(required for bidding)</span></label><input class="form-input" type="tel" id="rg-phone" placeholder="(813) 555-0000"/></div>
+      <div class="form-group"><label class="form-label">Street Address *</label><input class="form-input" type="text" id="rg-addr" placeholder="123 Main St"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">City *</label><input class="form-input" type="text" id="rg-city" placeholder="Tampa"/></div>
+        <div class="form-group"><label class="form-label">State *</label><input class="form-input" type="text" id="rg-state" placeholder="FL" maxlength="2"/></div>
+        <div class="form-group"><label class="form-label">ZIP *</label><input class="form-input" type="text" id="rg-zip" placeholder="33601" maxlength="10"/></div>
+      </div>
       <button class="btn btn-gold btn-full" id="rg-btn" onclick="doRegister()">🐺 Create Account</button>
       <p style="text-align:center;margin-top:.8rem;font-size:.8rem;color:var(--mid)">Have an account? <a href="#" onclick="switchMod('m-register','m-login')" style="color:var(--green);font-weight:600">Sign In</a></p>
     </div>
@@ -479,8 +485,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
         <div id="bid-img" style="width:54px;height:54px;border-radius:6px;overflow:hidden;background:var(--cream);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2rem"></div>
         <div><div style="font-weight:700;font-size:.88rem" id="bid-title"></div><div style="font-size:.76rem;color:var(--mid)">Current: <strong id="bid-curr" style="color:var(--green)"></strong></div></div>
       </div>
-      <div class="form-group"><label class="form-label">Your Bid Amount</label><input class="form-input" type="number" id="bid-amt" step="0.01"/><div class="form-hint" id="bid-hint"></div></div>
-      <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:6px;padding:.75rem;font-size:.78rem;margin-bottom:.85rem">⚡ We'll bid for you automatically up to your amount. <strong>10% buyer's premium</strong> applies to final price.</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Bid Increment</label>
+          <select class="form-input" id="bid-increment" onchange="updateBidMin()">
+            <option value="0.50">$0.50</option>
+            <option value="1.00" selected>$1.00</option>
+            <option value="2.50">$2.50</option>
+            <option value="5.00">$5.00</option>
+            <option value="10.00">$10.00</option>
+            <option value="25.00">$25.00</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Starting Bid</label>
+          <input class="form-input" type="number" id="bid-amt" step="0.50" style="background:var(--cream2);font-weight:700"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Max Bid (Auto-Bid Limit) <span style="font-size:.72rem;color:var(--mid)">— we bid for you up to this amount</span></label>
+        <input class="form-input" type="number" id="bid-max" step="0.50" placeholder="e.g. $20.00"/>
+        <div class="form-hint" id="bid-hint"></div>
+      </div>
+      <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:6px;padding:.75rem;font-size:.78rem;margin-bottom:.85rem">
+        ⚡ <strong>How auto-bid works:</strong> Set your max and we'll automatically outbid others in <span id="bid-incr-display">$1.00</span> increments — up to your limit. You only pay what's needed to win. <strong>10% buyer's premium</strong> applies.
+      </div>
       <button class="btn btn-gold btn-full" id="bid-btn" onclick="submitBid()">🔨 Place Bid</button>
     </div>
   </div>
@@ -754,10 +783,14 @@ async function doLogin() {
 }
 async function doRegister() {
   const first=$('rg-first').value.trim(),last=$('rg-last').value.trim(),email=$('rg-email').value.trim(),pass=$('rg-pass').value,phone=$('rg-phone').value.trim();
+  const addr=$('rg-addr').value.trim(),city=$('rg-city').value.trim(),state=$('rg-state').value.trim(),zip=$('rg-zip').value.trim();
   if(!first||!last||!email||!pass) return showErr('reg-err','Please fill all required fields');
+  if(!phone) return showErr('reg-err','Phone number is required');
+  if(!addr||!city||!state||!zip) return showErr('reg-err','Full address is required');
   btnLoad('rg-btn',true,'Creating account...');
+  const address=`${addr}, ${city}, ${state} ${zip}`;
   try {
-    const d = await api('POST','/auth/register',{first_name:first,last_name:last,email,password:pass,phone},false);
+    const d = await api('POST','/auth/register',{first_name:first,last_name:last,email,password:pass,phone,address},false);
     S.token=d.token; S.user=d.user;
     localStorage.setItem('la_token',d.token);
     localStorage.setItem('la_user',JSON.stringify(d.user));
@@ -984,6 +1017,15 @@ function changeImg(url,thumb){
 // ═══════════════════════════════════════════════════════════
 // BIDDING
 // ═══════════════════════════════════════════════════════════
+function updateBidMin() {
+  const incr=parseFloat($('bid-increment').value)||1;
+  const el=$$('bid-incr-display'); if(el) el.textContent=`$${incr.toFixed(2)}`;
+  if(!S.currentListing) return;
+  const curr=Number(S.currentListing.current_bid||S.currentListing.starting_bid||0);
+  const min=Math.round((curr+incr)*100)/100;
+  $('bid-amt').min=min; $('bid-amt').step=incr; $('bid-amt').value=min.toFixed(2);
+  $('bid-hint').textContent=`Minimum bid: $${min.toFixed(2)} (increment: $${incr.toFixed(2)})`;
+}
 function openBidModal(e, id) {
   if(e) e.stopPropagation();
   if(!S.user){openMod('m-login');return;}
@@ -993,9 +1035,9 @@ function openBidModal(e, id) {
     $('bid-img').innerHTML=img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover"/>`:(item.category_icon||'📦');
     $('bid-title').textContent=item.title;
     $('bid-curr').textContent='$'+fmt(item.current_bid||item.starting_bid||0);
-    const min=Number(item.current_bid||item.starting_bid||0)+1;
-    $('bid-amt').min=min; $('bid-amt').value=fmt(min,false);
-    $('bid-hint').textContent=`Minimum bid: $${fmt(min)}`;
+    $('bid-increment').value='1.00';
+    $('bid-max').value='';
+    updateBidMin();
     $('bid-err').classList.remove('show'); $('bid-err').textContent='';
     openMod('m-bid');
   }).catch(e=>toast(e.message,'⚠️'));
@@ -1003,10 +1045,13 @@ function openBidModal(e, id) {
 async function submitBid() {
   if(!S.user){openMod('m-login');return;}
   const amt=parseFloat($('bid-amt').value);
+  const maxAmt=parseFloat($('bid-max').value)||null;
+  const incr=parseFloat($('bid-increment').value)||1;
   if(!amt||amt<=0) return showErr('bid-err','Enter a valid bid amount');
+  if(maxAmt && maxAmt < amt) return showErr('bid-err','Max bid must be equal to or higher than your starting bid');
   btnLoad('bid-btn',true,'Placing bid...');
   try {
-    const d = await api('POST','/bids',{listing_id:S.currentListing.id,amount:amt});
+    const d = await api('POST','/bids',{listing_id:S.currentListing.id,amount:amt,max_amount:maxAmt,increment:incr});
     closeMod('m-bid'); toast(d.message,'🔨');
     if(S.page==='detail') loadDetail(S.currentListing.id); else loadListings();
   } catch(e){ showErr('bid-err',e.message); }
@@ -1573,6 +1618,7 @@ async function renderAdminUsers(c){
           <option value="">Role...</option><option value="customer">customer</option><option value="employee">employee</option><option value="manager">manager</option>
         </select>
         <button class="btn btn-sm" style="border:1.5px solid var(--border);background:#fff;font-size:.7rem" onclick="api('PUT','/admin/users/${u.id}/status',{is_active:${u.is_active?0:1}}).then(()=>{toast('Status updated','✅');loadAdmin('users')}).catch(e=>toast(e.message,'❌'))">${u.is_active?'Disable':'Enable'}</button>
+        ${u.role!=='owner'?`<button class="btn btn-red btn-sm" style="font-size:.7rem" onclick="if(confirm('Permanently delete ${esc(u.first_name)} ${esc(u.last_name)}? This cannot be undone.'))api('DELETE','/admin/users/${u.id}').then(()=>{toast('User deleted','✅');loadAdmin('users')}).catch(e=>toast(e.message,'❌'))">Delete</button>`:''}
       </td>`:''}
     </tr>`).join('')}
   </tbody></table></div>`;
