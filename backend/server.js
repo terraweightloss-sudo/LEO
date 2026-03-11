@@ -29,8 +29,9 @@ app.use(cors({
 }));
 
 // ── Rate limiting ────────────────────────────────────────
-app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, max: 30, message: { error: 'Too many requests, try again later' } }));
-app.use('/api', rateLimit({ windowMs: 1 * 60 * 1000, max: 200 }));
+const keyByUser = (req) => req.headers.authorization || req.ip;
+app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, max: 50, keyGenerator: (req) => req.ip, message: { error: 'Too many requests, try again later' } }));
+app.use('/api', rateLimit({ windowMs: 1 * 60 * 1000, max: 500, keyGenerator: keyByUser, message: { error: 'Too many requests' } }));
 
 // ── Body parsing (except for Stripe webhook) ────────────
 app.use((req, res, next) => {
