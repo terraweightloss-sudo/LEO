@@ -1,0 +1,60 @@
+# ─────────────────────────────────────────────────────────────
+# Leo's Auctions — Netlify Configuration
+# ─────────────────────────────────────────────────────────────
+#
+# DEPLOYMENT SETUP:
+#
+#   FRONTEND  → Netlify (this file handles it automatically)
+#   BACKEND   → Deploy separately on Railway, Render, or any Node host
+#               Then set API_BASE_URL in Netlify environment variables
+#
+# HOW TO DEPLOY:
+#   1. Push this repo to GitHub
+#   2. Connect the repo to Netlify (netlify.com → "Add new site")
+#   3. Set build settings:
+#        Base directory:    (leave empty — root of repo)
+#        Build command:     (leave empty — no build needed)
+#        Publish directory: frontend/public
+#   4. In Netlify → Site Settings → Environment Variables, add:
+#        API_BASE_URL = https://your-backend.railway.app   (your backend URL)
+#        STRIPE_PUBLISHABLE_KEY = pk_live_YOUR_KEY
+#   5. Deploy!
+# ─────────────────────────────────────────────────────────────
+
+[build]
+  publish = "frontend/public"
+  # No build command needed — pure HTML/JS/CSS
+
+# Route ALL requests through index.html (SPA routing)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Proxy /api/* calls to your backend server
+# Replace the :to URL with your actual backend URL after deploying the backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://YOUR-BACKEND-URL.railway.app/api/:splat"
+  status = 200
+  force = true
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache static assets aggressively
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

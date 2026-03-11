@@ -1,0 +1,12 @@
+node_modules/
+.env
+backend/db/leos_auctions.db
+backend/db/leos_auctions.db-wal
+backend/db/leos_auctions.db-shm
+backend/uploads/*.jpg
+backend/uploads/*.jpeg
+backend/uploads/*.png
+backend/uploads/*.webp
+backend/uploads/*.gif
+*.log
+.DS_Store
